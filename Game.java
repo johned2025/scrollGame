@@ -75,17 +75,23 @@ public class Game
     for(int i =0; i< grid.getNumRows();i++){
       for(int j=0; j< grid.getNumCols(); j++){
         String imageName = grid.getImage(new Location(i,j));
-        
+        String nextimageLoc;
         if(imageName != null){
           if(j>=0 && imageName.equals("get.gif")){
             if(j-1>=0){
-              grid.setImage(new Location(i,j-1), "get.gif"); 
+              nextimageLoc = grid.getImage(new Location(i,j-1));
+              if(nextimageLoc == null || !nextimageLoc.equals("user.gif")){
+                grid.setImage(new Location(i,j-1), "get.gif"); 
+              }
             }
             grid.setImage(new Location(i,j), null);
           }
           else if(j>=0 &&imageName.equals("avoid.gif")){
-            if(j-1>=0){
-              grid.setImage(new Location(i,j-1), "avoid.gif");
+            if(j-1>=0 ){
+              nextimageLoc = grid.getImage(new Location(i,j-1));
+              if(nextimageLoc == null || !nextimageLoc.equals("user.gif")){
+                grid.setImage(new Location(i,j-1), "avoid.gif"); 
+              } 
             }
             grid.setImage(new Location(i,j), null);   
           }
