@@ -20,7 +20,7 @@ public class Game
   
   public void play()
   {
-    while (!isGameOver())
+    while (true)
     {
       grid.pause(100);
       handleKeyPress();
@@ -31,19 +31,24 @@ public class Game
       }
       updateTitle();
       msElapsed += 100;
+      if(isGameOver()){
+        updateTitle();
+        break;
+      }
     }
   }
   
   public void handleKeyPress()
   {
     int key = grid.checkLastKeyPressed();
-    if (key == 40 && userRow< (grid.getNumRows()-1)){
+    if (key == 40 && userRow< (grid.getNumRows()-1)){ // arrow down
+      handleCollision(new Location(userRow,0),"arrowDown");
       grid.setImage(new Location(userRow,0), null);
       userRow+=1;
-      
       grid.setImage(new Location(userRow,0), "user.gif");
     }
-    else if (key == 38 && userRow>0){
+    else if (key == 38 && userRow>0){ //arrow up
+      handleCollision(new Location(userRow,0),"arrowUp");
       grid.setImage(new Location(userRow,0), null);
       userRow-=1;
       grid.setImage(new Location(userRow,0), "user.gif");
@@ -72,6 +77,7 @@ public class Game
   
   public void scrollLeft()
   {
+
     for(int i =0; i< grid.getNumRows();i++){
       for(int j=0; j< grid.getNumCols(); j++){
         String imageName = grid.getImage(new Location(i,j));
@@ -80,6 +86,7 @@ public class Game
           if(j>=0 && imageName.equals("get.gif")){
             if(j-1>=0){
               nextimageLoc = grid.getImage(new Location(i,j-1));
+              handleCollision(new Location(i,j),"get.gif") ;
               if(nextimageLoc == null || !nextimageLoc.equals("user.gif")){
                 grid.setImage(new Location(i,j-1), "get.gif"); 
               }
@@ -89,9 +96,11 @@ public class Game
           else if(j>=0 &&imageName.equals("avoid.gif")){
             if(j-1>=0 ){
               nextimageLoc = grid.getImage(new Location(i,j-1));
+              handleCollision(new Location(i,j),"avoid.gif");
               if(nextimageLoc == null || !nextimageLoc.equals("user.gif")){
                 grid.setImage(new Location(i,j-1), "avoid.gif"); 
               } 
+              
             }
             grid.setImage(new Location(i,j), null);   
           }
@@ -99,33 +108,79 @@ public class Game
       }
     }  
   }
-  /*  public int [] helper(int r, int c){
-    //for(int i=0; i<grid.getNumCols();i++){
-      
-    //}
-  }*/
-  public void handleCollision(Location loc)
+  
+  public void handleCollision(Location loc, String origin)
   {
+    //origin will be "arrowUp", "arrowDown","get.gif","avoid.gif"
+    // the method will receive the location 'loc' and the origin and operate accordingly 
+    String image = grid.getImage(loc);
+    Location nexLocation;
+    
+    if(origin.equals("arrowDown")){
+      System.err.println("location: ("+loc.getRow()+","+loc.getCol()+")");
+      nexLocation = new Location(loc.getRow()+1,loc.getCol());
+      
+    }else if(origin.equals("arrowUp")){
+      nexLocation = new Location(loc.getRow()-1,loc.getCol());
+    }
+    else{
+      nexLocation = new Location(loc.getRow(),loc.getCol()-1);
+    }
+    String nextimage = grid.getImage(nexLocation);
+   if(origin.equals("arrowDown")){
+      if (nextimage!=null && nextimage.equals("get.gif")){
+        timesGet++;
+      }
+      else if(nextimage!=null && nextimage.equals("avoid.gif")){
+        timesAvoid++;
+      }
+    }
+    else if(origin.equals("arrowUp")){
+      if (nextimage!=null && nextimage.equals("get.gif")){
+        timesGet++;
+      }
+      else if(nextimage!=null && nextimage.equals("avoid.gif")){
+        timesAvoid++;
+      }
+    }
+    else if(nextimage != null && nextimage.equals("user.gif") && image.equals("get.gif")){
+      System.out.println("collition");
+      timesGet++;            
+    }else if(nextimage != null && nextimage.equals("user.gif") && image.equals("avoid.gif")){
+      timesAvoid+=1;
+      System.out.println("times avoid: "+ timesAvoid);
+    }
+    else{
+      timesGet++;
+    }
   }
   
-  public int getScore()
+  public int [] getScore()
   {
-    return 0;
+    int [] score = {timesGet, timesAvoid};
+    return score;
   }
   
   public void updateTitle()
   {
-    grid.setTitle("Game:  " + getScore());
+    if(isGameOver()){
+      grid.setTitle("Game Over :( Score: " + getScore()[0]);  
+    }
+    else{
+      grid.setTitle("Score: " + getScore()[0]+"  Lives: "+ (4-getScore()[1]));
+    }
+
   }
   
   public boolean isGameOver()
   {
-    return false;
+    return timesAvoid>=4;
   }
   
   public static void test()
   {
     Game game = new Game();
+
     game.play();
   }
   
