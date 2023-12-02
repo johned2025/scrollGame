@@ -22,15 +22,20 @@ public class Game
   {
     while (true)
     {
-      grid.pause(100);
-      handleKeyPress();
-      if (msElapsed % 300 == 0)
+      grid.pause(100); //pause the game for 100 miliseconds
+      handleKeyPress(); // tests if a key was pressed
+      int level = 600;
+      if(timesGet%100 ==0){
+          level -=100;
+      }
+      
+      if (msElapsed % level == 0) //  scroll and populates left every 300 ms?
       {
         scrollLeft();
         populateRightEdge();
       }
       updateTitle();
-      msElapsed += 100;
+      msElapsed += 100;// increases in steps of 100
       if(isGameOver()){
         updateTitle();
         break;
