@@ -20,24 +20,29 @@ public class Game
   
   public void play()
   {
+    int delay=150;
     while (true)
-    {
-      grid.pause(100); //pause the game for 100 miliseconds
-      handleKeyPress(); // tests if a key was pressed
-      int level = 600;
-      if(timesGet%100 ==0){
-          level -=100;
+    { handleKeyPress();
+      if(msElapsed%12000 ==0){
+        delay-=10;
+        System.out.println("delay "+delay);
+        grid.setTitle("Level Up!");
       }
+      grid.pause(delay); //pause the game for 100 miliseconds
+       // tests if a key was pressed
       
-      if (msElapsed % level == 0) //  scroll and populates left every 300 ms?
+      if (msElapsed % 300 == 0) //  scroll and populates left every 300 ms?
       {
         scrollLeft();
         populateRightEdge();
+        updateTitle();
       }
-      updateTitle();
+      
+      
       msElapsed += 100;// increases in steps of 100
       if(isGameOver()){
         updateTitle();
+        grid.setImage(new Location(2,4),"gameOver.png");
         break;
       }
     }
@@ -66,7 +71,7 @@ public class Game
       int randomInt = (int) ( Math.random() * grid.getNumRows());
       int onOff= (int)(Math.random()+0.5);
       int quantity = (int)(Math.random()+1);
-      System.out.println(onOff);
+      
       Location RightMostloc =new Location(randomInt,grid.getNumCols()-1);
       if(onOff>0){
         
@@ -122,7 +127,7 @@ public class Game
     Location nexLocation;
     
     if(origin.equals("arrowDown")){
-      System.err.println("location: ("+loc.getRow()+","+loc.getCol()+")");
+     // System.err.println("location: ("+loc.getRow()+","+loc.getCol()+")");
       nexLocation = new Location(loc.getRow()+1,loc.getCol());
       
     }else if(origin.equals("arrowUp")){
@@ -149,11 +154,11 @@ public class Game
       }
     }
     else if(nextimage != null && nextimage.equals("user.gif") && image.equals("get.gif")){
-      System.out.println("collition");
+      
       timesGet++;            
     }else if(nextimage != null && nextimage.equals("user.gif") && image.equals("avoid.gif")){
       timesAvoid+=1;
-      System.out.println("times avoid: "+ timesAvoid);
+      
     }
     else{
       timesGet++;
